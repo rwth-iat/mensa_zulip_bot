@@ -1,0 +1,3 @@
+git+https://github.com/mhthies/mensa_aachen.git@master
+pytz
+zulip>=0.6
