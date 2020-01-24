@@ -118,14 +118,14 @@ def send_menu(client):
     logger.info("Sending messages ...")
     client.send_message({
         "type": "stream",
-        "to": ["bot-test"],
+        "to": ["Mensa"],
         "subject": subject,
         "content": formatted_menu,
     })
 
     client.send_message({
         "type": "stream",
-        "to": ["bot-test"],
+        "to": ["Mensa"],
         "subject": subject,
         "content": "@all Wer kommt mit essen? Bitte mit 👍 oder 👎 reagieren.",
     })
