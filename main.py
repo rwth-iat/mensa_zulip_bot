@@ -56,7 +56,7 @@ def main_loop():
     while True:
         try:
             sleep_time = calculate_sleep_time()
-            time.sleep(sleep_time.seconds)
+            time.sleep(sleep_time.total_seconds())
             send_menu(zulip_client)
 
         except KeyboardInterrupt:
