@@ -60,10 +60,16 @@ def main_loop():
     logger.info("Starting into main loop ...")
     while True:
         try:
+            # Calculate time until message and sleep
             sleep_time = calculate_sleep_time()
-            time.sleep(sleep_time.total_seconds())
+            logger.info("Scheduling next message for {}.".format(sleep_time))
+            logarithmic_sleep(sleep_time)
+
+            # Send messages
             send_menu(zulip_client, stream_name)
 
+            # Prevent fast retriggering
+            time.sleep(1)
         except KeyboardInterrupt:
             logger.info("Received KeyobardInterrupt. Exiting …")
             return
@@ -71,7 +77,7 @@ def main_loop():
             logger.error("Exception in main loop:", exc_info=e)
 
 
-def calculate_sleep_time() -> datetime.timedelta:
+def calculate_sleep_time() -> datetime.datetime:
     now = datetime.datetime.now(tz=INFO_TIME.tzinfo)
     res = now.replace(hour=INFO_TIME.hour, minute=INFO_TIME.minute, second=INFO_TIME.second,
                       microsecond=INFO_TIME.microsecond)
@@ -82,9 +88,17 @@ def calculate_sleep_time() -> datetime.timedelta:
     if res.weekday() >= 5:
         res += datetime.timedelta(days=7 - res.weekday())
 
-    delta = res - now
-    logger.info("Scheduling next message for {}. That's in {}.".format(res, delta))
-    return delta
+    return res
+
+
+def logarithmic_sleep(target: datetime.datetime):
+    while True:
+        diff = (target - datetime.datetime.now()).total_seconds()
+        if diff < 0.2:
+            time.sleep(diff)
+            return
+        else:
+            time.sleep(diff/2)
 
 
 def send_menu(client: zulip.Client, stream: str):
