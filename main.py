@@ -23,6 +23,7 @@
 """
 Zulip bot for sending Mensa Academica Aachen's menu to the PLT Zulip chat every workday at 11:25.
 """
+import configparser
 import datetime
 import logging
 import time
@@ -51,13 +52,17 @@ MEAT_ICONS = {
 
 def main_loop():
     logger.info("Initializing client ...")
-    zulip_client = zulip.Client(config_file=os.path.join(os.path.dirname(__file__), "config.ini"))
+    config_file = os.path.join(os.path.dirname(__file__), "config.ini")
+    config = configparser.ConfigParser()
+    config.read(config_file)
+    zulip_client = zulip.Client(config_file=config_file)
+    stream_name = config['message']['stream']
     logger.info("Starting into main loop ...")
     while True:
         try:
             sleep_time = calculate_sleep_time()
             time.sleep(sleep_time.total_seconds())
-            send_menu(zulip_client)
+            send_menu(zulip_client, stream_name)
 
         except KeyboardInterrupt:
             logger.info("Received KeyobardInterrupt. Exiting …")
@@ -82,7 +87,7 @@ def calculate_sleep_time() -> datetime.timedelta:
     return delta
 
 
-def send_menu(client):
+def send_menu(client: zulip.Client, stream: str):
     logger.info("Fetching menu data ...")
     try:
         menu_data = mensa_aachen.get_dishes(mensa_aachen.Canteens.MENSA_ACADEMICA)
@@ -118,14 +123,14 @@ def send_menu(client):
     logger.info("Sending messages ...")
     client.send_message({
         "type": "stream",
-        "to": ["Mensa"],
+        "to": [stream],
         "subject": subject,
         "content": formatted_menu,
     })
 
     client.send_message({
         "type": "stream",
-        "to": ["Mensa"],
+        "to": [stream],
         "subject": subject,
         "content": "@all Wer kommt mit essen? Bitte mit 👍 oder 👎 reagieren.",
     })
