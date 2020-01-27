@@ -93,7 +93,7 @@ def calculate_sleep_time() -> datetime.datetime:
 
 def logarithmic_sleep(target: datetime.datetime):
     while True:
-        diff = (target - datetime.datetime.now()).total_seconds()
+        diff = (target - datetime.datetime.now(tz=datetime.timezone.utc)).total_seconds()
         if diff < 0.2:
             time.sleep(diff)
             return
