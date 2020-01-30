@@ -26,6 +26,8 @@ Zulip bot for sending Mensa Academica Aachen's menu to the PLT Zulip chat every 
 import configparser
 import datetime
 import logging
+from typing import Iterable
+
 import time
 import os.path
 
@@ -40,14 +42,6 @@ INFO_TIME = datetime.time(11, 25, 00, tzinfo=pytz.timezone('Europe/Berlin'))
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-MEAT_ICONS = {
-    mensa_aachen.MeatType.RIND: "🐂",
-    mensa_aachen.MeatType.SCHWEIN: "🐖",
-    mensa_aachen.MeatType.GEFLUEGEL: "🐔",
-    mensa_aachen.MeatType.VEGETARIAN: "🥕",
-    mensa_aachen.MeatType.VEGAN: "🥗",
-}
 
 
 def main_loop():
@@ -122,7 +116,7 @@ def send_menu(client: zulip.Client, stream: str):
                 dish.menu_category,
                 dish.main_component.title,
                 " 〈{}〉".format(" • ".join(c.title for c in dish.aux_components)) if dish.aux_components else "",
-                " ".join(MEAT_ICONS[m] for m in dish.meat))
+                meat_emojis(dish.meat))
             for dish in filtered_dishes)
         + "\n\n Dazu:\n\n* {}, sowie\n* {}".format(
             " oder ".join(dish.main_component.title
@@ -149,6 +143,22 @@ def send_menu(client: zulip.Client, stream: str):
         "content": "@all Wer kommt mit essen? Bitte mit 👍 oder 👎 reagieren.",
     })
     logger.info("Sending messages finished.")
+
+
+MEAT_ICONS = {
+    mensa_aachen.MeatType.RIND: "🐂",
+    mensa_aachen.MeatType.SCHWEIN: "🐖",
+    mensa_aachen.MeatType.GEFLUEGEL: "🐔",
+    mensa_aachen.MeatType.VEGETARIAN: "🧀",
+    mensa_aachen.MeatType.VEGAN: "🥦",
+}
+
+
+def meat_emojis(meat: Iterable[mensa_aachen.MeatType]) -> str:
+    meat = set(meat)
+    if mensa_aachen.MeatType.VEGAN in meat:
+        meat.discard(mensa_aachen.MeatType.VEGETARIAN)
+    return " ".join(MEAT_ICONS[m] for m in meat)
 
 
 if __name__ == "__main__":
