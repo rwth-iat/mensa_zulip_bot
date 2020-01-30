@@ -112,7 +112,7 @@ def send_menu(client: zulip.Client, stream: str):
     logger.info("Fetching menu data finished.")
 
     filtered_dishes = [dish for dish in menu.main_dishes
-                       if dish.menu_category not in ("Pizza Classics", "Burger Classics", "Fingerfood", "Sandwich",
+                       if dish.menu_category not in ("Pizza Classics", "Burger Classics", "Fingerfood",
                                                      "Ofenkartoffel")]
     formatted_menu = (
         "# Speiseplan Mensa Academica {:%d.%m.%Y}\n\n"
