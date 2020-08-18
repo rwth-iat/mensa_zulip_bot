@@ -151,6 +151,7 @@ MEAT_ICONS = {
     mensa_aachen.MeatType.GEFLUEGEL: "🐔",
     mensa_aachen.MeatType.VEGETARIAN: "🧀",
     mensa_aachen.MeatType.VEGAN: "🥦",
+    mensa_aachen.MeatType.FISCH: "🐟",
 }
 
 
