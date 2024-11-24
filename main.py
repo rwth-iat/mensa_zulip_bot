@@ -65,7 +65,7 @@ def main_loop():
             # Prevent fast retriggering
             time.sleep(1)
         except KeyboardInterrupt:
-            logger.info("Received KeyobardInterrupt. Exiting …")
+            logger.info("Received KeyboardInterrupt. Exiting …")
             return
         except Exception as e:
             logger.error("Exception in main loop:", exc_info=e)
